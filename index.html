@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+        integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+        integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+        crossorigin=""></script>
+    <style>
+        #mapid {
+            height: 600px;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+    <button type="submit" onclick="userCode()">Get Location</button>
+    <br><br>
+    <div id="mapid" style="width: 600px; height: 400px;"></div>
+
+
+    <div>
+        <p id="location"></p>
+        <br>
+        <p id="deviceid"></p>
+    </div>
+    <script>
+        const Mapping = {
+            map: null,
+            initializeMap: () => {
+                Mapping.map = L.map('mapid').setView([51.505, -0.09], 13);
+                L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                    subdomains: ['a', 'b', 'c']
+                }).addTo(Mapping.map);
+            },
+            resetLocation: ({
+                lat,
+                lon
+            }) => {
+                Mapping.map.setView([lat, lon], 13);
+            }
+        }
+
+        window.onload = () => {
+            Mapping.initializeMap();
+            userCode();
+        }
+
+        function userCode() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    let pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    console.log(pos);
+                    document.getElementById("location").innerHTML = "Lat : " + pos.lat + ' ' + "Lng : " + pos
+                        .lng;
+                    //JSON.stringify(pos.lat);
+                    Mapping.resetLocation({
+                        lat: pos.lat,
+                        lon: pos.lng
+                    });
+                    //Mapping.setPosition(pos);
+                    //Mapping.open(Mapping.map);
+                    //Mapping.map.setPosition(pos);
+                })
+            }
+        }
+
+        //UNIQUE DEVICE ID GENERATION
+        var navigator_info = window.navigator;
+        var screen_info = window.screen;
+        var uid = navigator_info.mimeTypes.length;
+        uid += navigator_info.userAgent.replace(/\D+/g, '');
+        uid += navigator_info.plugins.length;
+        uid += screen_info.height || '';
+        uid += screen_info.width || '';
+        uid += screen_info.pixelDepth || '';
+
+        document.getElementById("deviceid").innerHTML = uid;
+    </script>
+</body>
+
+</html>
